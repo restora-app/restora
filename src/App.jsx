@@ -7,7 +7,7 @@ import Footer from './components/Footer/Footer';
 import questions from './data/questions';
 
 /**
- * Clarity Study — Cognitive Fatigue Research Landing Page
+ * Restora — Cognitive Fatigue Research Landing Page
  */
 export default function App() {
   return (

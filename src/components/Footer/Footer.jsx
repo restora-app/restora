@@ -4,7 +4,10 @@
 export default function Footer() {
   return (
     <footer className="w-full py-xl bg-surface-container-low mt-xl flex flex-col items-center gap-md text-center px-gutter">
-      <span className="text-headline-lg text-primary">Clarity Study</span>
+      <span className="text-headline-lg text-primary">Restora</span>
+      <p className="text-body-sm text-on-surface-variant font-medium tracking-wide">
+        Out of the Fog, Into the Flow
+      </p>
 
       <div className="flex flex-wrap justify-center gap-md">
         <a

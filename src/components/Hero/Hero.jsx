@@ -6,8 +6,17 @@ import { MdBatteryAlert } from 'react-icons/md';
 export default function Hero() {
   return (
     <header className="max-w-[800px] mx-auto px-gutter pt-[112px] pb-lg text-center flex flex-col items-center gap-md">
-      <div className="w-16 h-16 bg-secondary-fixed flex items-center justify-center rounded-full mb-sm animate-gentle-bounce">
+      <div className="w-16 h-16 bg-secondary-fixed flex items-center justify-center rounded-full mb-xs animate-gentle-bounce">
         <MdBatteryAlert size={30} className="text-primary" />
+      </div>
+
+      <div className="flex flex-col gap-1 mb-sm">
+        <span className="text-headline-md font-black text-primary tracking-wide">
+          Restora
+        </span>
+        <span className="text-label-md font-bold text-secondary tracking-widest uppercase">
+          Out of the Fog, Into the Flow
+        </span>
       </div>
 
       <h1 className="text-headline-xl md:text-headline-xl max-w-2xl text-primary leading-tight">
