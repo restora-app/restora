@@ -1,29 +1,27 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import BackgroundOrbs from './components/BackgroundOrbs/BackgroundOrbs';
 import Navbar from './components/Navbar/Navbar';
-import Hero from './components/Hero/Hero';
-import InfoCard from './components/InfoCard/InfoCard';
-import SurveySection from './components/SurveySection/SurveySection';
 import Footer from './components/Footer/Footer';
-import questions from './data/questions';
+import HomePage from './pages/HomePage';
+import AboutUsPage from './pages/AboutUsPage';
 
 /**
  * Restora — Cognitive Fatigue Research Landing Page
  */
 export default function App() {
   return (
-    <div className="bg-background text-on-surface font-sans overflow-x-hidden">
-      <BackgroundOrbs />
-      <Navbar />
+    <BrowserRouter>
+      <div className="bg-background text-on-surface font-sans overflow-x-hidden">
+        <BackgroundOrbs />
+        <Navbar />
 
-      <main className="relative pt-xl">
-        <Hero />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutUsPage />} />
+        </Routes>
 
-        <InfoCard />
-
-        <SurveySection questions={questions} />
-      </main>
-
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </BrowserRouter>
   );
 }
