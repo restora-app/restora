@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import QuestionCard from "../QuestionCard/QuestionCard";
 import supabase from "../../lib/supabase";
 import {
@@ -11,7 +12,23 @@ import {
   MdArrowForward,
   MdArrowBack,
   MdAccessTime,
+  MdSpa,
+  MdAutoStories,
+  MdPsychologyAlt,
+  MdRestaurantMenu,
+  MdCloud,
+  MdSmartDisplay,
+  MdBolt,
 } from "react-icons/md";
+
+const iconMap = {
+  auto_stories: MdAutoStories,
+  psychology_alt: MdPsychologyAlt,
+  restaurant_menu: MdRestaurantMenu,
+  cloud: MdCloud,
+  smart_display: MdSmartDisplay,
+  bolt: MdBolt,
+};
 
 /**
  * Step-by-step questionnaire form section.
@@ -151,10 +168,17 @@ export default function SurveySection({ questions = [] }) {
         </div>
       </div>
 
-      <div className="relative w-full max-w-[600px]">
-        {/* Step 0: Personal Info */}
-        {currentStep === 0 && (
-          <div className="bg-surface shadow-md p-md md:p-lg border-[#f4ece3] border-2 rounded-3xl text-center animate-fade-in-up glass-panel">
+      <div className="relative w-full max-w-[600px] bg-surface shadow-md p-5 md:p-8 border-[#f4ece3] border-2 rounded-3xl glass-panel">
+        <AnimatePresence mode="wait">
+          {/* Step 0: Personal Info */}
+          {currentStep === 0 && (
+            <motion.div
+              key="step0"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } }}
+              exit={{ opacity: 0, y: -10, transition: { duration: 0.25, ease: "easeIn" } }}
+              className="text-center flex flex-col w-full"
+            >
             <div className="flex justify-center items-center bg-[#f4ece3] mx-auto mb-sm rounded-full w-12 h-12">
               <MdPerson size={24} className="text-[#6d4c41]" />
             </div>
@@ -303,112 +327,129 @@ export default function SurveySection({ questions = [] }) {
                 Continue <MdArrowForward size={20} />
               </button>
             </form>
-          </div>
+          </motion.div>
         )}
 
-        {/* Step 1..N: Questions */}
-        {currentStep > 0 && (
-          <div className="bg-surface shadow-md p-md md:p-lg border-[#f4ece3] border-2 rounded-3xl animate-fade-in-up glass-panel">
-            <h3 className="mb-lg text-center text-label-md text-tertiary uppercase tracking-widest">
-              Question {currentStep}
-            </h3>
+          {/* Step 1..N: Questions */}
+          {currentStep > 0 && (() => {
+            const currentQuestion = questions[currentStep - 1];
+            const categoryQuestions = questions.filter((q) => q.category === currentQuestion.category);
+            const indexInCategory = categoryQuestions.findIndex((q) => q.id === currentQuestion.id) + 1;
+            const IconComponent = iconMap[currentQuestion.icon];
 
-            <div className="flex justify-center items-center mb-xl min-h-[140px]">
-              <QuestionCard
-                key={questions[currentStep - 1].id}
-                icon={questions[currentStep - 1].icon}
-                text={questions[currentStep - 1].text}
-                answer={answers[questions[currentStep - 1].id]}
-                onAnswer={(ans) => {
-                  handleAnswer(questions[currentStep - 1].id, ans);
-                  // Optional: Auto-advance after a short delay if they provided an answer
-                  if (ans && currentStep < totalSteps - 1) {
-                    setTimeout(() => {
-                      setCurrentStep((prev) => prev + 1);
-                    }, 400);
-                  }
-                }}
-              />
-            </div>
-
-            {/* Error Message */}
-            {submitError && (
-              <div className="flex items-center gap-3 bg-error-container mb-lg p-sm rounded-lg text-on-error-container animate-fade-in-up">
-                <MdErrorOutline
-                  size={20}
-                  className="flex-shrink-0 text-error"
-                />
-                <p className="flex-1 text-sm">{submitError}</p>
-              </div>
-            )}
-
-            <div className="flex justify-between items-center mt-lg pt-lg border-outline-variant/20 border-t">
-              <button
-                type="button"
-                onClick={handleBack}
-                className="flex items-center gap-2 hover:bg-surface-container px-4 py-2 rounded-full font-semibold text-on-surface-variant transition-colors"
+            return (
+              <motion.div
+                key={`step${currentStep}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } }}
+                exit={{ opacity: 0, y: -10, transition: { duration: 0.25, ease: "easeIn" } }}
+                className="flex flex-col w-full"
               >
-                <MdArrowBack size={20} /> Back
-              </button>
+              
+              {/* Header */}
+              <div className="flex justify-center items-center relative mb-4 w-full">
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="absolute left-0 top-0 text-on-surface-variant font-medium flex items-center gap-1 hover:text-primary transition-colors text-sm"
+                >
+                  <MdArrowBack size={18} /> Previous
+                </button>
+                
+                <div className="flex flex-col items-center">
+                  <div className="w-12 h-12 bg-[#fcece4] rounded-full flex items-center justify-center mb-2 text-[#b64b16]">
+                    {IconComponent && <IconComponent size={28} />}
+                  </div>
+                  <h2 className="text-lg font-bold text-[#b64b16]">
+                    {currentQuestion.category}
+                  </h2>
+                  <span className="text-xs font-medium text-on-surface-variant mt-1">
+                    Question {indexInCategory} of {categoryQuestions.length}
+                  </span>
+                  <div className="w-8 h-[2px] bg-[#f3d9cd] rounded-full mt-2"></div>
+                </div>
+              </div>
 
-              {currentStep < totalSteps - 1 ? (
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  disabled={!canGoNext}
-                  className={`py-3 px-8 rounded-full font-bold transition-all duration-300 flex items-center gap-2
-                    ${
-                      canGoNext
-                        ? "bg-primary text-white hover:scale-105 hover:shadow-lg bloom-shadow-primary cursor-pointer"
-                        : "bg-surface-container-high text-outline cursor-not-allowed"
-                    }`}
-                  style={
-                    canGoNext
-                      ? { backgroundColor: "var(--color-primary, #b64b16)" }
-                      : {}
-                  }
-                >
-                  Next <MdArrowForward size={20} />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={
-                    !canGoNext || isSubmitting || answeredCount < minRequired
-                  }
-                  className={`py-3 px-8 rounded-full font-bold transition-all duration-300 flex items-center gap-2
-                    ${
-                      canGoNext && !isSubmitting && answeredCount >= minRequired
-                        ? "bg-primary text-white hover:scale-105 hover:shadow-lg bloom-shadow-primary cursor-pointer"
-                        : "bg-surface-container-high text-outline cursor-not-allowed"
-                    }`}
-                  style={
-                    canGoNext && !isSubmitting && answeredCount >= minRequired
-                      ? { backgroundColor: "var(--color-primary, #b64b16)" }
-                      : {}
-                  }
-                >
-                  {isSubmitting ? (
-                    <>
-                      <span className="border-2 border-white/30 border-t-white rounded-full w-5 h-5 animate-spin"></span>
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      Submit <MdSend size={20} />
-                    </>
-                  )}
-                </button>
+              {/* Error Message */}
+              {submitError && (
+                <div className="flex items-center gap-3 bg-error-container mb-lg p-sm rounded-lg text-on-error-container animate-fade-in-up">
+                  <MdErrorOutline
+                    size={20}
+                    className="flex-shrink-0 text-error"
+                  />
+                  <p className="flex-1 text-sm">{submitError}</p>
+                </div>
               )}
-            </div>
-            {currentStep === totalSteps - 1 && answeredCount < minRequired && (
-              <p className="mt-4 text-center text-error text-sm animate-fade-in-up">
-                Please answer at least {minRequired} questions to submit.
-              </p>
-            )}
-          </div>
-        )}
+
+              {/* QuestionCard */}
+              <div className="flex justify-center items-center mb-4 w-full flex-1">
+                <QuestionCard
+                  key={currentQuestion.id}
+                  text={currentQuestion.text}
+                  answer={answers[currentQuestion.id]}
+                  options={currentQuestion.options}
+                  onAnswer={(ans) => {
+                    handleAnswer(currentQuestion.id, ans);
+                    // Auto-advance after a short delay
+                    if (ans && currentStep < totalSteps - 1) {
+                      setTimeout(() => {
+                        setCurrentStep((prev) => prev + 1);
+                      }, 400);
+                    }
+                  }}
+                />
+              </div>
+
+              {/* Submit Button (Only on last question) */}
+              {currentStep === totalSteps - 1 && (
+                <div className="flex flex-col items-center mt-4 mb-8">
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={isSubmitting || answeredCount < minRequired}
+                    className={`py-3 px-10 rounded-full font-bold transition-all duration-300 flex items-center gap-2
+                      ${
+                        !isSubmitting && answeredCount >= minRequired
+                          ? "bg-primary text-white hover:scale-105 hover:shadow-lg bloom-shadow-primary cursor-pointer"
+                          : "bg-surface-container-high text-outline cursor-not-allowed"
+                      }`}
+                    style={
+                      !isSubmitting && answeredCount >= minRequired
+                        ? { backgroundColor: "var(--color-primary, #b64b16)" }
+                        : {}
+                    }
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <span className="border-2 border-white/30 border-t-white rounded-full w-5 h-5 animate-spin"></span>
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        Submit <MdSend size={20} />
+                      </>
+                    )}
+                  </button>
+                  {answeredCount < minRequired && (
+                    <p className="mt-4 text-center text-error text-sm animate-fade-in-up">
+                      Please answer at least {minRequired} questions to submit.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Footer Quote */}
+              <div className="mt-2 text-center flex flex-col items-center justify-end">
+                <MdSpa size={24} className="text-[#f3d9cd] mb-1" />
+                <p className="text-xs font-medium text-on-surface-variant max-w-xs mx-auto">
+                  {currentQuestion.quote}
+                </p>
+              </div>
+
+              </motion.div>
+            );
+          })()}
+        </AnimatePresence>
       </div>
     </section>
   );

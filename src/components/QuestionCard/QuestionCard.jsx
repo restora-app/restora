@@ -1,81 +1,98 @@
-import {
-  MdAutoStories,
-  MdPsychologyAlt,
-  MdRestaurantMenu,
-  MdCloud,
-  MdSmartDisplay,
-  MdBolt,
-} from 'react-icons/md';
-
-/** Map icon string keys to react-icons components */
-const iconMap = {
-  auto_stories: MdAutoStories,
-  psychology_alt: MdPsychologyAlt,
-  restaurant_menu: MdRestaurantMenu,
-  cloud: MdCloud,
-  smart_display: MdSmartDisplay,
-  bolt: MdBolt,
-};
+import { MdCheck, MdClose } from 'react-icons/md';
 
 /**
  * Individual self-assessment question card.
- * Users respond with Yes or No buttons.
+ * Users respond with options (defaults to Yes / No).
  */
-export default function QuestionCard({ icon, text, answer, onAnswer }) {
-  const IconComponent = iconMap[icon];
-
+export default function QuestionCard({ text, answer, onAnswer, options }) {
   return (
-    <div
-      className={`glass-panel text-left p-md md:p-lg min-h-[100px] rounded-lg border-2 transition-all duration-300 flex items-center gap-md
-        ${
-          answer === 'yes'
-            ? 'bg-secondary-container border-secondary'
-            : answer === 'no'
-              ? 'bg-surface-container border-outline-variant/50'
-              : 'border-transparent'
+    <div className="w-full flex flex-col items-center">
+      <h3 className="text-xl md:text-2xl font-bold text-center text-on-surface mb-4 max-w-xl mx-auto leading-snug">
+        {text}
+      </h3>
+
+      <div
+        className={`grid gap-3 w-full ${
+          options && options.length >= 4
+            ? 'grid-cols-1 sm:grid-cols-2 max-w-[600px]'
+            : 'grid-cols-1 max-w-[400px]'
         }`}
-    >
-      {IconComponent && (
-        <IconComponent
-          size={24}
-          className={`text-secondary flex-shrink-0 transition-opacity
-            ${answer !== undefined && answer !== null ? 'opacity-100' : 'opacity-60'}`}
-        />
-      )}
+      >
+        {options ? (
+          options.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => onAnswer(opt.value)}
+              className={`flex items-center p-3 rounded-2xl font-bold text-base transition-all border-2
+                ${
+                  answer === opt.value
+                    ? 'bg-[#fcece4] border-[#fcece4] text-[#b64b16]'
+                    : 'bg-[#fcfaf8] border-[#f4ece3] text-on-surface hover:border-[#e8dacd]'
+                }`}
+            >
+              <div
+                className={`w-6 h-6 rounded-full flex items-center justify-center mr-4
+                  ${
+                    answer === opt.value
+                      ? 'bg-[#f3d9cd] text-[#b64b16]'
+                      : 'bg-[#f4ece3] text-on-surface-variant'
+                  }`}
+              >
+                {answer === opt.value ? <MdCheck size={16} /> : null}
+              </div>
+              <span className="flex-1 text-center pr-2">{opt.label}</span>
+            </button>
+          ))
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={() => onAnswer('yes')}
+              className={`flex items-center p-3 rounded-2xl font-bold text-base transition-all border-2
+                ${
+                  answer === 'yes'
+                    ? 'bg-[#fcece4] border-[#fcece4] text-[#b64b16]'
+                    : 'bg-[#fcfaf8] border-[#f4ece3] text-on-surface hover:border-[#e8dacd]'
+                }`}
+            >
+              <div
+                className={`w-6 h-6 rounded-full flex items-center justify-center mr-4
+                  ${
+                    answer === 'yes'
+                      ? 'bg-[#f3d9cd] text-[#b64b16]'
+                      : 'bg-[#f4ece3] text-on-surface-variant'
+                  }`}
+              >
+                <MdCheck size={16} />
+              </div>
+              <span className="flex-1 text-center pr-12">Yes</span>
+            </button>
 
-      <span className="text-body-lg text-on-surface flex-1">{text}</span>
-
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <button
-          type="button"
-          onClick={() => {
-            const newVal = answer === 'yes' ? null : 'yes';
-            onAnswer?.(newVal);
-          }}
-          className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 
-            ${
-              answer === 'yes'
-                ? 'bg-primary text-on-primary bloom-shadow-primary scale-105'
-                : 'bg-surface-container-high text-on-surface-variant hover:bg-primary-fixed hover:text-on-primary-fixed hover:scale-105'
-            }`}
-        >
-          Yes
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            const newVal = answer === 'no' ? null : 'no';
-            onAnswer?.(newVal);
-          }}
-          className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-200
-            ${
-              answer === 'no'
-                ? 'bg-outline text-on-primary scale-105'
-                : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest hover:scale-105'
-            }`}
-        >
-          No
-        </button>
+            <button
+              type="button"
+              onClick={() => onAnswer('no')}
+              className={`flex items-center p-3 rounded-2xl font-bold text-base transition-all border-2
+                ${
+                  answer === 'no'
+                    ? 'bg-[#f5f5f5] border-[#e0e0e0] text-on-surface'
+                    : 'bg-[#fcfaf8] border-[#f4ece3] text-on-surface hover:border-[#e8dacd]'
+                }`}
+            >
+              <div
+                className={`w-6 h-6 rounded-full flex items-center justify-center mr-4
+                  ${
+                    answer === 'no'
+                      ? 'bg-[#e0e0e0] text-on-surface-variant'
+                      : 'bg-[#f4ece3] text-on-surface-variant'
+                  }`}
+              >
+                <MdClose size={16} />
+              </div>
+              <span className="flex-1 text-center pr-12">No</span>
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
