@@ -7,7 +7,7 @@ import { trackEvent } from "../../lib/analytics";
  */
 export default function Hero() {
   return (
-    <header className="flex flex-col items-center gap-xl mx-auto px-gutter pt-8 md:pt-16 pb-lg max-w-[1100px]">
+    <header className="flex flex-col items-center gap-xl mx-auto px-gutter pt-8 md:pt-16 pb-lg w-full">
       <div className="items-center gap-8 grid grid-cols-1 md:grid-cols-2 w-full">
         <div className="flex flex-col items-start gap-6 text-left">
           <div className="flex flex-col gap-1">

@@ -27,7 +27,7 @@ const symptoms = [
  */
 export default function InfoCard() {
   return (
-    <section className="w-full px-gutter mb-xl opacity-0 animate-fade-in-up">
+    <section className="w-full mb-xl opacity-0 animate-fade-in-up">
       <h2 className="text-label-md uppercase tracking-widest text-secondary text-center mb-8">
         Sound familiar?
       </h2>

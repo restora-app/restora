@@ -250,7 +250,7 @@ export default function SurveySection({ questions = [] }) {
   return (
     <section
       id="survey-anchor"
-      className="flex flex-col justify-center items-center mx-auto px-gutter py-2 max-w-[900px] min-h-[calc(100vh-120px)]"
+      className="flex flex-col justify-center items-center mx-auto px-gutter py-2 w-full min-h-[calc(100vh-120px)]"
     >
       {/* Progress Indicator */}
       <div className="flex flex-col items-center mb-md w-full">

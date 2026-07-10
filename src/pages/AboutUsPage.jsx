@@ -19,9 +19,9 @@ export default function AboutUsPage() {
   }, []);
 
   return (
-    <main className="relative pt-xl pb-xl">
+    <main className="relative pt-xl pb-xl w-[85%] mx-auto">
       {/* ── Back Navigation ── */}
-      <div className="px-gutter max-w-[1000px] mx-auto mb-lg">
+      <div className="px-gutter w-full mx-auto mb-lg">
         <Link
           to="/"
           className="inline-flex items-center gap-2 text-label-md text-on-surface-variant font-bold hover:text-primary transition-colors duration-300 group"
@@ -37,7 +37,7 @@ export default function AboutUsPage() {
       {/* ═══════════════════════════════════════════════════════════
           SECTION 1 — What is Restora?
           ═══════════════════════════════════════════════════════════ */}
-      <section className="px-gutter max-w-[1000px] mx-auto mb-xl">
+      <section className="px-gutter w-full mx-auto mb-xl">
         {/* Hero area */}
         <motion.div
           className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-xl"
@@ -137,7 +137,7 @@ export default function AboutUsPage() {
       {/* ═══════════════════════════════════════════════════════════
           SECTION 2 — Meet the Team
           ═══════════════════════════════════════════════════════════ */}
-      <section className="px-gutter max-w-[1000px] mx-auto mb-xl">
+      <section className="px-gutter w-full mx-auto mb-xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -167,7 +167,7 @@ export default function AboutUsPage() {
       {/* ═══════════════════════════════════════════════════════════
           SECTION 3 — Join the Movement CTA
           ═══════════════════════════════════════════════════════════ */}
-      <section className="px-gutter max-w-[1000px] mx-auto">
+      <section className="px-gutter w-full mx-auto">
         <motion.div
           className="relative overflow-hidden rounded-lg p-10 text-center bg-gradient-to-br from-primary-fixed via-secondary-fixed to-tertiary-fixed/40 border border-outline-variant/20"
           initial={{ opacity: 0, y: 20 }}

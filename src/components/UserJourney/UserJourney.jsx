@@ -284,7 +284,7 @@ export default function UserJourney() {
       </motion.div>
 
       {/* ── Timeline Container ── */}
-      <div className="relative max-w-[1000px] mx-auto">
+      <div className="relative w-full mx-auto">
         {/* ── Vertical Timeline Line ── */}
         <div
           ref={timelineRef}

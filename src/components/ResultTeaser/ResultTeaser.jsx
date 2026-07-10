@@ -230,7 +230,7 @@ export default function ResultTeaser({
   const firstName = name?.split(" ")[0] || name;
 
   return (
-    <section className="mx-auto px-gutter py-xl max-w-[800px] animate-fade-in-up">
+    <section className="mx-auto px-gutter py-xl w-full animate-fade-in-up">
       {/* ─── Collapsible thank-you line ─── */}
       <div
         className={`overflow-hidden transition-all duration-700 ease-in-out ${

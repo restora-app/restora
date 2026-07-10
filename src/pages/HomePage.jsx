@@ -9,7 +9,7 @@ import questions from '../data/questions';
  */
 export default function HomePage() {
   return (
-    <main className="relative pt-xl">
+    <main className="relative pt-xl w-[85%] mx-auto">
       <Hero />
       <InfoCard />
       <SurveySection questions={questions} />

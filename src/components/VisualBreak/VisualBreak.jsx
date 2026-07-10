@@ -3,7 +3,7 @@
  */
 export default function VisualBreak() {
   return (
-    <section className="max-w-[800px] mx-auto px-gutter my-xl">
+    <section className="w-full mx-auto my-xl">
       <div className="relative overflow-hidden rounded-xl h-64">
         {/* Background overlay */}
         <div className="absolute inset-0 bg-tertiary-fixed/20 backdrop-blur-sm" />
