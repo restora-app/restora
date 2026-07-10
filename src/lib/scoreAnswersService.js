@@ -76,6 +76,77 @@ export const DIMENSION_INSIGHTS = {
     "Your rest isn't actually restful. True cognitive recovery means unstimulated downtime — not just switching screens.",
 };
 
+// Human-readable one-liner for each dimension score (keyed by severity band)
+export const DIMENSION_TRANSLATIONS = {
+  attention_fragmentation: {
+    low: "Your focus holds reasonably well through the day.",
+    moderate: "You're losing focus before you even notice it's gone.",
+    high: "Your attention is scattering the moment something moves on screen.",
+  },
+  working_memory: {
+    low: "You're holding onto tasks and context without much trouble.",
+    moderate: "You're losing the thread before you finish the thought.",
+    high: "You're re-reading the same paragraph three times and nothing sticks.",
+  },
+  decision_fatigue: {
+    low: "Everyday choices aren't draining you much.",
+    moderate: "Small decisions are eating into your energy before lunch.",
+    high: "You're paralysed by what to eat for dinner because your brain is spent.",
+  },
+  dopamine_dependency: {
+    low: "You can sit with boredom without reaching for your phone.",
+    moderate: "You're reaching for a scroll hit every time focus dips.",
+    high: "Nothing feels interesting unless it's instant and novel.",
+  },
+  recovery_quality: {
+    low: "Your downtime actually recharges you.",
+    moderate: "Your breaks refuel the body but leave the mind buzzing.",
+    high: "You're waking up tired because rest never reaches your brain.",
+  },
+};
+
+// Headline sentence per severity level that interprets the overall score
+export const SEVERITY_HEADLINES = {
+  low: "Your cognitive stamina is in decent shape — but there's room to sharpen it.",
+  moderate: "Your brain is running at below half capacity by midday.",
+  high: "Your mind is hitting a wall well before your day is over.",
+};
+
+// What Restora will do for the dominant dimension
+export const DOMINANT_RECOVERY_PROMISE = {
+  attention_fragmentation:
+    "Restoring your attention span will have the fastest impact on how present you feel.",
+  working_memory:
+    "Restoring your working memory will have the fastest impact on how sharp you feel.",
+  decision_fatigue:
+    "Reducing your decision load will have the fastest impact on how energised you feel.",
+  dopamine_dependency:
+    "Resetting your reward baseline will have the fastest impact on how motivated you feel.",
+  recovery_quality:
+    "Fixing your recovery quality will have the fastest impact on how rested you feel.",
+};
+
+// One concrete thing they can do today
+export const QUICK_ACTION_TIPS = {
+  attention_fragmentation:
+    "Try this today: put your phone in another room for 90 minutes and work on one thing. You'll feel the difference within a week.",
+  working_memory:
+    "Try this today: write down every open loop on your mind right now. Externalising them frees up the mental RAM your brain is burning.",
+  decision_fatigue:
+    "Try this today: pick your outfit and lunch the night before. Two fewer decisions in the morning compounds fast.",
+  dopamine_dependency:
+    "Try this today: leave your phone out of reach for the first 30 minutes after waking. Your baseline starts recalibrating within days.",
+  recovery_quality:
+    "Try this today: spend 20 minutes doing nothing — no screens, no podcasts, no music. Just sit. That's what real rest feels like.",
+};
+
+/** Helper: get severity band for a single dimension score */
+export function getDimensionSeverity(score) {
+  if (score >= 65) return "high";
+  if (score >= 35) return "moderate";
+  return "low";
+}
+
 /**
  * @param {Object} answers  — { [questionId]: 'never'|'rarely'|'sometimes'|'often'|'always'|null }
  * @returns {Object}        — scored result (see JSDoc above)
