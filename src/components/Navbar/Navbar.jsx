@@ -8,10 +8,11 @@ import { trackEvent } from "../../lib/analytics";
 export default function Navbar() {
   const location = useLocation();
   const isHome = location.pathname === '/';
+  const isAbout = location.pathname === '/about';
 
   const anchorLinks = [
     { label: 'Approach', href: '#solution' },
-    { label: 'Survey', href: '#survey-anchor' },
+    // { label: 'Survey', href: '#survey-anchor' },
   ];
 
   return (
@@ -31,34 +32,24 @@ export default function Navbar() {
         {/* Links and CTA */}
         <div className="flex items-center gap-md sm:gap-lg">
           <div className="hidden md:flex items-center gap-md">
-            {/* Anchor links — only work on home page, so navigate there if needed */}
-            {anchorLinks.map((link) =>
-              isHome ? (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className="text-label-md text-on-surface-variant font-bold hover:text-primary transition-colors duration-300"
-                >
-                  {link.label}
-                </a>
-              ) : (
-                <Link
-                  key={link.label}
-                  to={`/${link.href}`}
-                  className="text-label-md text-on-surface-variant font-bold hover:text-primary transition-colors duration-300"
-                >
-                  {link.label}
-                </Link>
-              )
+            {/* Home link — only shown on About Us page */}
+            {isAbout && (
+              <NavLink to="/" label="Home" active={false} />
             )}
 
-            {/* About Us — route link */}
-            <Link
-              to="/about"
-              className="text-label-md text-on-surface-variant font-bold hover:text-primary transition-colors duration-300"
-            >
-              About Us
-            </Link>
+            {/* Anchor links — only shown on home page */}
+            {isHome && anchorLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="text-label-md text-on-surface-variant font-bold hover:text-primary transition-colors duration-300"
+              >
+                {link.label}
+              </a>
+            ))}
+
+            {/* About Us — route link, always visible */}
+            <NavLink to="/about" label="About Us" active={isAbout} />
           </div>
 
           <Link
@@ -80,5 +71,24 @@ export default function Navbar() {
         </div>
       </div>
     </nav>
+  );
+}
+
+/* ── NavLink sub-component with active highlight ── */
+function NavLink({ to, label, active }) {
+  return (
+    <Link
+      to={to}
+      className={`relative text-label-md font-bold transition-colors duration-300 px-3 py-1 rounded-full
+        ${active
+          ? 'text-primary bg-primary/10'
+          : 'text-on-surface-variant hover:text-primary hover:bg-primary/5'
+        }`}
+    >
+      {label}
+      {active && (
+        <span className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[6px] w-1 h-1 rounded-full bg-primary" />
+      )}
+    </Link>
   );
 }

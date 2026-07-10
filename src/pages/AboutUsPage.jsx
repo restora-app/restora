@@ -19,20 +19,8 @@ export default function AboutUsPage() {
   }, []);
 
   return (
-    <main className="relative pt-xl pb-xl w-[85%] mx-auto">
-      {/* ── Back Navigation ── */}
-      <div className="px-gutter w-full mx-auto mb-lg">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-label-md text-on-surface-variant font-bold hover:text-primary transition-colors duration-300 group"
-        >
-          <ArrowLeft
-            size={18}
-            className="group-hover:-translate-x-1 transition-transform duration-300"
-          />
-          Back to Home
-        </Link>
-      </div>
+    <main className="relative pt-[110px] pb-xl w-[85%] mx-auto">
+     
 
       {/* ═══════════════════════════════════════════════════════════
           SECTION 1 — What is Restora?
