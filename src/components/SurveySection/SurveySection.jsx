@@ -250,7 +250,7 @@ export default function SurveySection({ questions = [] }) {
   return (
     <section
       id="survey-anchor"
-      className="flex flex-col justify-center items-center mx-auto px-gutter py-2 max-w-[800px] min-h-[calc(100vh-120px)]"
+      className="flex flex-col justify-center items-center mx-auto px-gutter py-2 max-w-[900px] min-h-[calc(100vh-120px)]"
     >
       {/* Progress Indicator */}
       <div className="flex flex-col items-center mb-md w-full">
@@ -275,7 +275,7 @@ export default function SurveySection({ questions = [] }) {
         </div>
       </div>
 
-      <div className="relative bg-surface shadow-md p-5 md:p-8 border-[#f4ece3] border-2 rounded-3xl w-full max-w-[600px] glass-panel">
+      <div className="relative bg-surface shadow-md p-5 md:p-8 border-[#f4ece3] border-2 rounded-3xl w-full max-w-[700px] glass-panel">
         <AnimatePresence mode="wait">
           {/* Step 0: Personal Info */}
           {currentStep === 0 && (

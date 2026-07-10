@@ -201,13 +201,21 @@ export default function UserJourney() {
   /* ── Intersection Observer for active step ── */
   useEffect(() => {
     const observers = [];
+    const visibleSteps = new Set();
 
     stepRefs.current.forEach((ref, index) => {
       if (!ref) return;
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
-            setActiveStep((prev) => Math.max(prev, index));
+            visibleSteps.add(index);
+          } else {
+            visibleSteps.delete(index);
+          }
+          if (visibleSteps.size > 0) {
+            setActiveStep(Math.max(...visibleSteps));
+          } else {
+            setActiveStep(-1);
           }
         },
         { threshold: 0.4, rootMargin: '-10% 0px -30% 0px' }
@@ -261,7 +269,7 @@ export default function UserJourney() {
         className="text-center max-w-2xl mx-auto mb-xl"
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-80px' }}
+        viewport={{ once: false, margin: '-80px' }}
         transition={{ duration: 0.6 }}
       >
         <span className="font-bold text-label-md text-secondary uppercase tracking-[0.2em]">
@@ -276,7 +284,7 @@ export default function UserJourney() {
       </motion.div>
 
       {/* ── Timeline Container ── */}
-      <div className="relative max-w-[900px] mx-auto">
+      <div className="relative max-w-[1000px] mx-auto">
         {/* ── Vertical Timeline Line ── */}
         <div
           ref={timelineRef}
@@ -293,176 +301,16 @@ export default function UserJourney() {
 
         {/* ── Steps ── */}
         <div className="relative flex flex-col gap-4">
-          {journeySteps.map((step, index) => {
-            const isEven = index % 2 === 0;
-            const isRevealed = index <= activeStep;
-
-            return (
-              <motion.div
-                key={step.number}
-                ref={(el) => (stepRefs.current[index] = el)}
-                className="relative"
-                initial={{ opacity: 0, y: 60, scale: 0.95 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{
-                  duration: 0.7,
-                  delay: 0.15,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-              >
-                {/* ── Mobile Layout ── */}
-                <div className="flex items-start gap-5 md:hidden">
-                  {/* Icon node */}
-                  <div className="relative flex-shrink-0 z-10">
-                    <motion.div
-                      className="absolute inset-0 rounded-2xl"
-                      animate={
-                        isRevealed
-                          ? {
-                              boxShadow: [
-                                '0 0 0px 0px rgba(158,61,0,0)',
-                                '0 0 16px 3px rgba(158,61,0,0.12)',
-                                '0 0 0px 0px rgba(158,61,0,0)',
-                              ],
-                            }
-                          : {}
-                      }
-                      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                    />
-                    <div
-                      className={`w-[60px] h-[60px] rounded-2xl border-2 flex items-center justify-center p-3 transition-all duration-700 ${
-                        isRevealed
-                          ? 'bg-surface-container-lowest border-primary/30 shadow-lg'
-                          : 'bg-surface-container border-outline-variant/20'
-                      }`}
-                    >
-                      <JourneyIcon type={step.icon} isActive={isRevealed} />
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <motion.div
-                    className={`flex-1 p-5 rounded-xl backdrop-blur-md border transition-all duration-500 ${
-                      isRevealed
-                        ? 'bg-surface-container-lowest/70 border-primary/15 shadow-[0_8px_32px_-8px_rgba(158,61,0,0.08)]'
-                        : 'bg-surface-container/40 border-outline-variant/10'
-                    }`}
-                    whileHover={{ scale: 1.01 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                  >
-                    <h3
-                      className={`text-body-lg font-bold mb-1.5 transition-colors duration-500 ${
-                        isRevealed ? 'text-on-surface' : 'text-on-surface-variant/60'
-                      }`}
-                    >
-                      {step.title}
-                    </h3>
-                    <p
-                      className={`text-body-md leading-relaxed transition-colors duration-500 ${
-                        isRevealed ? 'text-on-surface-variant' : 'text-on-surface-variant/40'
-                      }`}
-                    >
-                      {step.description}
-                    </p>
-                  </motion.div>
-                </div>
-
-                {/* ── Desktop Layout (3-column grid) ── */}
-                <div className="hidden md:grid md:grid-cols-[1fr_100px_1fr] md:items-start md:gap-0">
-                  {/* Left column */}
-                  <div className={`${isEven ? 'pr-6' : ''}`}>
-                    {isEven && (
-                      <motion.div
-                        className={`p-6 rounded-xl backdrop-blur-md border transition-all duration-500 cursor-default text-right ${
-                          isRevealed
-                            ? 'bg-surface-container-lowest/70 border-primary/15 shadow-[0_8px_32px_-8px_rgba(158,61,0,0.08)] hover:shadow-[0_12px_40px_-8px_rgba(158,61,0,0.14)] hover:-translate-y-1'
-                            : 'bg-surface-container/40 border-outline-variant/10'
-                        }`}
-                        whileHover={{ scale: 1.015 }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                      >
-                        <h3
-                          className={`text-body-lg font-bold mb-2 transition-colors duration-500 ${
-                            isRevealed ? 'text-on-surface' : 'text-on-surface-variant/60'
-                          }`}
-                        >
-                          {step.title}
-                        </h3>
-                        <p
-                          className={`text-body-md leading-relaxed transition-colors duration-500 ${
-                            isRevealed ? 'text-on-surface-variant' : 'text-on-surface-variant/40'
-                          }`}
-                        >
-                          {step.description}
-                        </p>
-                      </motion.div>
-                    )}
-                  </div>
-
-                  {/* Center column — Icon node */}
-                  <div className="flex justify-center relative z-10">
-                    <div className="relative">
-                      <motion.div
-                        className="absolute inset-0 rounded-[20px]"
-                        animate={
-                          isRevealed
-                            ? {
-                                boxShadow: [
-                                  '0 0 0px 0px rgba(158,61,0,0)',
-                                  '0 0 20px 4px rgba(158,61,0,0.15)',
-                                  '0 0 0px 0px rgba(158,61,0,0)',
-                                ],
-                              }
-                            : {}
-                        }
-                        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                      />
-                      <div
-                        className={`w-[80px] h-[80px] rounded-[20px] border-2 flex items-center justify-center p-4 transition-all duration-700 ${
-                          isRevealed
-                            ? 'bg-surface-container-lowest border-primary/30 shadow-lg'
-                            : 'bg-surface-container border-outline-variant/20'
-                        }`}
-                      >
-                        <JourneyIcon type={step.icon} isActive={isRevealed} />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Right column */}
-                  <div className={`${!isEven ? 'pl-6' : ''}`}>
-                    {!isEven && (
-                      <motion.div
-                        className={`p-6 rounded-xl backdrop-blur-md border transition-all duration-500 cursor-default text-left ${
-                          isRevealed
-                            ? 'bg-surface-container-lowest/70 border-primary/15 shadow-[0_8px_32px_-8px_rgba(158,61,0,0.08)] hover:shadow-[0_12px_40px_-8px_rgba(158,61,0,0.14)] hover:-translate-y-1'
-                            : 'bg-surface-container/40 border-outline-variant/10'
-                        }`}
-                        whileHover={{ scale: 1.015 }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                      >
-                        <h3
-                          className={`text-body-lg font-bold mb-2 transition-colors duration-500 ${
-                            isRevealed ? 'text-on-surface' : 'text-on-surface-variant/60'
-                          }`}
-                        >
-                          {step.title}
-                        </h3>
-                        <p
-                          className={`text-body-md leading-relaxed transition-colors duration-500 ${
-                            isRevealed ? 'text-on-surface-variant' : 'text-on-surface-variant/40'
-                          }`}
-                        >
-                          {step.description}
-                        </p>
-                      </motion.div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
+          {journeySteps.map((step, index) => (
+            <TimelineStep
+              key={step.number}
+              step={step}
+              index={index}
+              isEven={index % 2 === 0}
+              isRevealed={index <= activeStep}
+              stepRef={(el) => (stepRefs.current[index] = el)}
+            />
+          ))}
         </div>
       </div>
 
@@ -470,3 +318,222 @@ export default function UserJourney() {
     </section>
   );
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Timeline Step — per-step scroll-linked opacity
+   ───────────────────────────────────────────────────────────── */
+function TimelineStep({ step, index, isEven, isRevealed, stepRef }) {
+  const ref = useRef(null);
+
+  /* Track how far this step has scrolled through the viewport.
+     progress 0   = step's top just entered the bottom of the viewport
+     progress 0.5 = step is roughly centered
+     progress 1   = step's bottom just left the top of the viewport */
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start end', 'end start'],
+  });
+
+  /* Map scroll progress → opacity:
+     0.0 – 0.15 : fade in  (0 → 1)  — entering from bottom
+     0.15 – 0.7 : full     (1)      — in view
+     0.7 – 1.0  : fade out (1 → 0)  — leaving from top */
+  const scrollOpacity = useTransform(scrollYProgress, [0, 0.15, 0.7, 1], [0, 1, 1, 0]);
+  const smoothOpacity = useSpring(scrollOpacity, { stiffness: 100, damping: 20 });
+
+  return (
+    <motion.div
+      ref={(el) => { ref.current = el; stepRef(el); }}
+      className="relative"
+      style={{ opacity: smoothOpacity }}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: false, amount: 0.3 }}
+      variants={{
+        hidden: {
+          y: 40,
+          scale: 0.97,
+          transition: { duration: 0.4, ease: [0.4, 0, 1, 1] },
+        },
+        visible: {
+          y: 0,
+          scale: 1,
+          transition: {
+            duration: 0.7,
+            delay: 0.1,
+            ease: [0.22, 1, 0.36, 1],
+          },
+        },
+      }}
+    >
+      {/* ── Mobile Layout ── */}
+      <div className="flex items-start gap-5 md:hidden">
+        {/* Icon node */}
+        <div className="relative flex-shrink-0 z-10">
+          <motion.div
+            className="absolute inset-0 rounded-2xl"
+            animate={
+              isRevealed
+                ? {
+                    boxShadow: [
+                      '0 0 0px 0px rgba(158,61,0,0)',
+                      '0 0 16px 3px rgba(158,61,0,0.12)',
+                      '0 0 0px 0px rgba(158,61,0,0)',
+                    ],
+                  }
+                : {}
+            }
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <div
+            className={`w-[60px] h-[60px] rounded-2xl border-2 flex items-center justify-center p-3 transition-all duration-700 ${
+              isRevealed
+                ? 'bg-surface-container-lowest border-primary/30 shadow-lg'
+                : 'bg-surface-container border-outline-variant/20'
+            }`}
+          >
+            <JourneyIcon type={step.icon} isActive={isRevealed} />
+          </div>
+        </div>
+
+        {/* Content */}
+        <motion.div
+          className={`flex-1 p-5 rounded-xl backdrop-blur-md border transition-all duration-500 ${
+            isRevealed
+              ? 'bg-surface-container-lowest/70 border-primary/15 shadow-[0_8px_32px_-8px_rgba(158,61,0,0.08)]'
+              : 'bg-surface-container/40 border-outline-variant/10'
+          }`}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.3 }}
+          variants={{
+            hidden: { x: 20, transition: { duration: 0.35, ease: [0.4, 0, 1, 1] } },
+            visible: { x: 0, transition: { duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] } },
+          }}
+          whileHover={{ scale: 1.01 }}
+        >
+          <h3
+            className={`text-body-lg font-bold mb-1.5 transition-colors duration-500 ${
+              isRevealed ? 'text-on-surface' : 'text-on-surface-variant/60'
+            }`}
+          >
+            {step.title}
+          </h3>
+          <p
+            className={`text-body-md leading-relaxed transition-colors duration-500 ${
+              isRevealed ? 'text-on-surface-variant' : 'text-on-surface-variant/40'
+            }`}
+          >
+            {step.description}
+          </p>
+        </motion.div>
+      </div>
+
+      {/* ── Desktop Layout (3-column grid) ── */}
+      <div className="hidden md:grid md:grid-cols-[1fr_100px_1fr] md:items-start md:gap-0">
+        {/* Left column */}
+        <div className={`${isEven ? 'pr-6' : ''}`}>
+          {isEven && (
+            <motion.div
+              className={`p-6 rounded-xl backdrop-blur-md border transition-all duration-500 cursor-default text-right ${
+                isRevealed
+                  ? 'bg-surface-container-lowest/70 border-primary/15 shadow-[0_8px_32px_-8px_rgba(158,61,0,0.08)] hover:shadow-[0_12px_40px_-8px_rgba(158,61,0,0.14)] hover:-translate-y-1'
+                  : 'bg-surface-container/40 border-outline-variant/10'
+              }`}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.3 }}
+              variants={{
+                hidden: { x: -30, transition: { duration: 0.35, ease: [0.4, 0, 1, 1] } },
+                visible: { x: 0, transition: { duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] } },
+              }}
+              whileHover={{ scale: 1.015 }}
+            >
+              <h3
+                className={`text-body-lg font-bold mb-2 transition-colors duration-500 ${
+                  isRevealed ? 'text-on-surface' : 'text-on-surface-variant/60'
+                }`}
+              >
+                {step.title}
+              </h3>
+              <p
+                className={`text-body-md leading-relaxed transition-colors duration-500 ${
+                  isRevealed ? 'text-on-surface-variant' : 'text-on-surface-variant/40'
+                }`}
+              >
+                {step.description}
+              </p>
+            </motion.div>
+          )}
+        </div>
+
+        {/* Center column — Icon node */}
+        <div className="flex justify-center relative z-10">
+          <div className="relative">
+            <motion.div
+              className="absolute inset-0 rounded-[20px]"
+              animate={
+                isRevealed
+                  ? {
+                      boxShadow: [
+                        '0 0 0px 0px rgba(158,61,0,0)',
+                        '0 0 20px 4px rgba(158,61,0,0.15)',
+                        '0 0 0px 0px rgba(158,61,0,0)',
+                      ],
+                    }
+                  : {}
+              }
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <div
+              className={`w-[80px] h-[80px] rounded-[20px] border-2 flex items-center justify-center p-4 transition-all duration-700 ${
+                isRevealed
+                  ? 'bg-surface-container-lowest border-primary/30 shadow-lg'
+                  : 'bg-surface-container border-outline-variant/20'
+              }`}
+            >
+              <JourneyIcon type={step.icon} isActive={isRevealed} />
+            </div>
+          </div>
+        </div>
+
+        {/* Right column */}
+        <div className={`${!isEven ? 'pl-6' : ''}`}>
+          {!isEven && (
+            <motion.div
+              className={`p-6 rounded-xl backdrop-blur-md border transition-all duration-500 cursor-default text-left ${
+                isRevealed
+                  ? 'bg-surface-container-lowest/70 border-primary/15 shadow-[0_8px_32px_-8px_rgba(158,61,0,0.08)] hover:shadow-[0_12px_40px_-8px_rgba(158,61,0,0.14)] hover:-translate-y-1'
+                  : 'bg-surface-container/40 border-outline-variant/10'
+              }`}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.3 }}
+              variants={{
+                hidden: { x: 30, transition: { duration: 0.35, ease: [0.4, 0, 1, 1] } },
+                visible: { x: 0, transition: { duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] } },
+              }}
+              whileHover={{ scale: 1.015 }}
+            >
+              <h3
+                className={`text-body-lg font-bold mb-2 transition-colors duration-500 ${
+                  isRevealed ? 'text-on-surface' : 'text-on-surface-variant/60'
+                }`}
+              >
+                {step.title}
+              </h3>
+              <p
+                className={`text-body-md leading-relaxed transition-colors duration-500 ${
+                  isRevealed ? 'text-on-surface-variant' : 'text-on-surface-variant/40'
+                }`}
+              >
+                {step.description}
+              </p>
+            </motion.div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
