@@ -1,5 +1,6 @@
 import mascot from "../../assets/images/confused_mascot.png";
 import { Zap, ArrowRight, Clock, Brain, Smartphone } from "lucide-react";
+import { trackEvent } from "../../lib/analytics";
 
 /**
  * Hero section with left-right split layout, headline, subtext, mascot image, CTA button, and stats.
@@ -27,6 +28,7 @@ export default function Hero() {
           <div className="inline-block bg-gradient-to-r from-orange-400/80 to-amber-200/80 shadow-[0_0_20px_rgba(255,150,100,0.3)] mt-2 p-[3px] rounded-full transition-all duration-300 hover:scale-105 active:scale-95">
             <a
               href="#survey-anchor"
+              onClick={() => trackEvent("Clicked Take 60 Second Check", { location: "hero" })}
               className="flex items-center gap-4 bg-primary py-2 pr-6 pl-2 rounded-full w-full h-full font-bold text-on-primary"
             >
               <div className="flex justify-center items-center bg-white/20 rounded-full w-10 h-10 shrink-0">

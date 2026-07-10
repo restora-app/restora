@@ -3,6 +3,7 @@
  */
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../../assets/images/logo.png';
+import { trackEvent } from "../../lib/analytics";
 
 export default function Navbar() {
   const location = useLocation();
@@ -63,6 +64,7 @@ export default function Navbar() {
           <Link
             to={isHome ? '/#survey-anchor' : '/'}
             onClick={(e) => {
+              trackEvent("Clicked Get Started", { location: "navbar" });
               if (isHome) {
                 e.preventDefault();
                 document.getElementById('survey-anchor')?.scrollIntoView({ behavior: 'smooth' });

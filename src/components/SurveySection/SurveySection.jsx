@@ -102,6 +102,32 @@ export default function SurveySection({ questions = [] }) {
   const [submitError, setSubmitError] = useState("");
   const [scoreResult, setScoreResult] = useState(null);
 
+  // Track drop-offs
+  const currentStepRef = useRef(currentStep);
+  const submittedRef = useRef(submitted);
+
+  useEffect(() => {
+    currentStepRef.current = currentStep;
+    submittedRef.current = submitted;
+  }, [currentStep, submitted]);
+
+  useEffect(() => {
+    const handleDropOff = () => {
+      // If user passed the personal info step but didn't submit
+      if (currentStepRef.current > 0 && !submittedRef.current) {
+        trackEvent("Survey Drop Off", {
+          drop_off_step: currentStepRef.current,
+        });
+      }
+    };
+
+    window.addEventListener("beforeunload", handleDropOff);
+    return () => {
+      window.removeEventListener("beforeunload", handleDropOff);
+      handleDropOff(); // Fire on unmount as well
+    };
+  }, []);
+
   const totalSteps = questions.length + 1; // 1 for personal info
 
   const handleAnswer = (questionId, answer) => {
