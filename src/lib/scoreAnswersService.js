@@ -126,18 +126,32 @@ export const DOMINANT_RECOVERY_PROMISE = {
     "Fixing your recovery quality will have the fastest impact on how rested you feel.",
 };
 
-// One concrete thing they can do today
 export const QUICK_ACTION_TIPS = {
-  attention_fragmentation:
-    "Try this today: put your phone in another room for 90 minutes and work on one thing. You'll feel the difference within a week.",
-  working_memory:
-    "Try this today: write down every open loop on your mind right now. Externalising them frees up the mental RAM your brain is burning.",
-  decision_fatigue:
-    "Try this today: pick your outfit and lunch the night before. Two fewer decisions in the morning compounds fast.",
-  dopamine_dependency:
-    "Try this today: leave your phone out of reach for the first 30 minutes after waking. Your baseline starts recalibrating within days.",
-  recovery_quality:
-    "Try this today: spend 20 minutes doing nothing — no screens, no podcasts, no music. Just sit. That's what real rest feels like.",
+  attention_fragmentation: [
+    { text: "Work in strict 25-minute focus blocks.", icon: "Timer" },
+    { text: "Keep your phone in another room.", icon: "Smartphone" },
+    { text: "Write down distractions instead of acting on them.", icon: "PenTool" }
+  ],
+  working_memory: [
+    { text: "Write down every open loop in your mind.", icon: "List" },
+    { text: "Do one thing at a time. No multitasking.", icon: "Target" },
+    { text: "Take 5-minute transition breaks between tasks.", icon: "Coffee" }
+  ],
+  decision_fatigue: [
+    { text: "Pick your outfit and lunch the night before.", icon: "Calendar" },
+    { text: "Tackle your hardest choices first thing in the morning.", icon: "Sun" },
+    { text: "Set simple defaults for low-stakes decisions.", icon: "CheckCircle2" }
+  ],
+  dopamine_dependency: [
+    { text: "No phone for the first 30 minutes after waking.", icon: "Sunrise" },
+    { text: "Turn your phone screen to grayscale mode.", icon: "MonitorOff" },
+    { text: "Replace one scroll session with a short walk.", icon: "Activity" }
+  ],
+  recovery_quality: [
+    { text: "Spend 20 minutes doing nothing.", icon: "BatteryCharging" },
+    { text: "No screens, no music, no podcasts.", icon: "Music" },
+    { text: "Just sit. That's what real rest feels like.", icon: "Wind" }
+  ],
 };
 
 /** Helper: get severity band for a single dimension score */

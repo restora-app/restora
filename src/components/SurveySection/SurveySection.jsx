@@ -6,7 +6,6 @@ import supabase from "../../lib/supabase";
 import {
   scoreAnswers,
   DIMENSION_LABELS,
-  DIMENSION_INSIGHTS,
 } from "../../lib/scoreAnswersService";
 import { trackEvent, identifyUser } from "../../lib/analytics";
 import PhoneInput, {
@@ -166,9 +165,7 @@ export default function SurveySection({ questions = [] }) {
       });
     }
 
-    if (currentStep < totalSteps - 1) {
-      setCurrentStep((prev) => prev + 1);
-    }
+    setCurrentStep((prev) => (prev < totalSteps - 1 ? prev + 1 : prev));
   };
 
   const handleBack = () => {
@@ -505,6 +502,8 @@ export default function SurveySection({ questions = [] }) {
           {currentStep > 0 &&
             (() => {
               const currentQuestion = questions[currentStep - 1];
+              if (!currentQuestion) return null;
+
               const categoryQuestions = questions.filter(
                 (q) => q.category === currentQuestion.category,
               );
@@ -577,7 +576,9 @@ export default function SurveySection({ questions = [] }) {
                         // Auto-advance after a short delay
                         if (ans && currentStep < totalSteps - 1) {
                           setTimeout(() => {
-                            setCurrentStep((prev) => prev + 1);
+                            setCurrentStep((prev) =>
+                              prev < totalSteps - 1 ? prev + 1 : prev
+                            );
                           }, 400);
                         }
                       }}
