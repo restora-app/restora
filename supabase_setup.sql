@@ -5,7 +5,10 @@ CREATE TABLE IF NOT EXISTS survey_responses (
   name          TEXT NOT NULL,
   contact_method TEXT NOT NULL CHECK (contact_method IN ('email', 'mobile')),
   contact_value TEXT NOT NULL,
-  answers       JSONB DEFAULT '{}'::jsonb
+  answers       JSONB DEFAULT '{}'::jsonb,
+  referral_code TEXT UNIQUE,
+  referred_by   TEXT,
+  session_token UUID UNIQUE
 );
 
 -- Add a comment for documentation
@@ -20,5 +23,23 @@ CREATE POLICY "Allow anonymous inserts"
   FOR INSERT
   TO anon
   WITH CHECK (true);
+
+-- RPC to securely fetch a user's survey response by their secret session token
+CREATE OR REPLACE FUNCTION get_my_survey(token UUID)
+RETURNS SETOF survey_responses
+LANGUAGE sql
+SECURITY DEFINER
+AS $$
+  SELECT * FROM survey_responses WHERE session_token = token;
+$$;
+
+-- RPC to securely update a user's survey answers by their secret session token
+CREATE OR REPLACE FUNCTION update_my_answers(token UUID, new_answers JSONB)
+RETURNS void
+LANGUAGE sql
+SECURITY DEFINER
+AS $$
+  UPDATE survey_responses SET answers = new_answers WHERE session_token = token;
+$$;
 
 

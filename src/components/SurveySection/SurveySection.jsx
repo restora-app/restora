@@ -91,7 +91,40 @@ export default function SurveySection({ questions = [] }) {
 
   useEffect(() => {
     trackEvent("Survey Intro Viewed");
-  }, []);
+
+    const initSession = async () => {
+      const storedToken = localStorage.getItem("restora_session_token");
+      if (storedToken) {
+        setSessionToken(storedToken);
+        const { data, error } = await supabase.rpc('get_my_survey', { token: storedToken });
+        
+        if (!error && data && data.length > 0) {
+          const userResponse = data[0];
+          setName(userResponse.name);
+          setContactMethod(userResponse.contact_method);
+          setContactValue(userResponse.contact_value);
+          setAnswers(userResponse.answers || {});
+          setReferralCode(userResponse.referral_code);
+          
+          const ansKeys = Object.keys(userResponse.answers || {});
+          const minReq = Math.min(3, questions.length);
+          if (ansKeys.length >= minReq) {
+            setAlreadyWaitlisted(true);
+            const result = scoreAnswers(userResponse.answers || {});
+            setScoreResult(result);
+            setSubmitted(true);
+          } else {
+            const nextQIndex = questions.findIndex(q => !(userResponse.answers || {})[q.id]);
+            setCurrentStep(nextQIndex === -1 ? questions.length : nextQIndex + 1);
+          }
+        } else {
+          localStorage.removeItem("restora_session_token");
+          setSessionToken("");
+        }
+      }
+    };
+    initSession();
+  }, [questions]);
   const [name, setName] = useState("");
   const [contactMethod, setContactMethod] = useState(""); // '' | 'email' | 'mobile'
   const [contactValue, setContactValue] = useState("");
@@ -100,6 +133,9 @@ export default function SurveySection({ questions = [] }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [scoreResult, setScoreResult] = useState(null);
+  const [referralCode, setReferralCode] = useState("");
+  const [sessionToken, setSessionToken] = useState("");
+  const [alreadyWaitlisted, setAlreadyWaitlisted] = useState(false);
 
   // Track drop-offs
   const currentStepRef = useRef(currentStep);
@@ -130,7 +166,15 @@ export default function SurveySection({ questions = [] }) {
   const totalSteps = questions.length + 1; // 1 for personal info
 
   const handleAnswer = (questionId, answer) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: answer }));
+    setAnswers((prev) => {
+      const newAnswers = { ...prev, [questionId]: answer };
+      if (sessionToken) {
+        supabase.rpc('update_my_answers', { token: sessionToken, new_answers: newAnswers }).then(({error}) => {
+          if (error) console.error("Error updating answers:", error);
+        });
+      }
+      return newAnswers;
+    });
     
     const question = questions.find(q => q.id === questionId);
     trackEvent("Question Answered", {
@@ -152,10 +196,51 @@ export default function SurveySection({ questions = [] }) {
     return false;
   })();
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep === 0 && !isPersonalInfoValid) return;
 
     if (currentStep === 0) {
+      if (!sessionToken) {
+        setIsSubmitting(true);
+        const generateUUID = () => {
+          return typeof crypto !== 'undefined' && crypto.randomUUID
+            ? crypto.randomUUID()
+            : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+              });
+        };
+        const newToken = generateUUID();
+        const newReferralCode = Math.random().toString(36).substring(2, 10);
+        const urlParams = new URLSearchParams(window.location.search);
+        const referredBy = urlParams.get("ref");
+
+        const { error } = await supabase.from("survey_responses").insert([
+          {
+            name: name.trim(),
+            contact_method: contactMethod,
+            contact_value: contactValue.trim(),
+            answers: answers,
+            referral_code: newReferralCode,
+            referred_by: referredBy || null,
+            session_token: newToken
+          },
+        ]);
+
+        if (error) {
+          console.error("Insert error:", error);
+          setSubmitError("Failed to start. Please try again.");
+          setIsSubmitting(false);
+          return;
+        }
+
+        setSessionToken(newToken);
+        setReferralCode(newReferralCode);
+        localStorage.setItem("restora_session_token", newToken);
+        setIsSubmitting(false);
+      }
+
       identifyUser(contactValue.trim(), {
         name: name.trim(),
         contact_method: contactMethod,
@@ -187,16 +272,10 @@ export default function SurveySection({ questions = [] }) {
     setSubmitError("");
 
     try {
-      const { error } = await supabase.from("survey_responses").insert([
-        {
-          name: name.trim(),
-          contact_method: contactMethod,
-          contact_value: contactValue.trim(),
-          answers: answers,
-        },
-      ]);
-
-      if (error) throw error;
+      if (sessionToken) {
+        const { error } = await supabase.rpc('update_my_answers', { token: sessionToken, new_answers: answers });
+        if (error) throw error;
+      }
 
       const result = scoreAnswers(answers);
       setScoreResult(result);
@@ -206,7 +285,8 @@ export default function SurveySection({ questions = [] }) {
         total_answered: Object.keys(answers).length,
         overall_score: result.overallScore,
         dominant_dimension: result.dominantDimension,
-        severity: result.severity
+        severity: result.severity,
+        referred_by: referredBy || null
       });
     } catch (err) {
       console.error("Supabase insert error:", err);
@@ -227,6 +307,8 @@ export default function SurveySection({ questions = [] }) {
         contactMethod={contactMethod}
         contactValue={contactValue}
         scoreResult={scoreResult}
+        referralCode={referralCode}
+        alreadyWaitlisted={alreadyWaitlisted}
       />
     );
   }
@@ -479,20 +561,29 @@ export default function SurveySection({ questions = [] }) {
 
                 <button
                   type="submit"
-                  disabled={!isPersonalInfoValid}
+                  disabled={!isPersonalInfoValid || isSubmitting}
                   className={`mt-6 w-full flex items-center justify-center gap-2 py-4 px-6 rounded-full font-bold text-lg transition-all duration-300
                   ${
-                    isPersonalInfoValid
+                    isPersonalInfoValid && !isSubmitting
                       ? "bg-primary text-white hover:scale-[1.02] hover:shadow-lg bloom-shadow-primary cursor-pointer"
                       : "bg-surface-container-high text-outline cursor-not-allowed"
                   }`}
                   style={
-                    isPersonalInfoValid
+                    isPersonalInfoValid && !isSubmitting
                       ? { backgroundColor: "var(--color-primary, #b64b16)" }
                       : {}
                   }
                 >
-                  Continue <MdArrowForward size={20} />
+                  {isSubmitting ? (
+                    <>
+                      <span className="border-2 border-white/30 border-t-white rounded-full w-5 h-5 animate-spin"></span>
+                      Starting...
+                    </>
+                  ) : (
+                    <>
+                      Continue <MdArrowForward size={20} />
+                    </>
+                  )}
                 </button>
               </form>
             </motion.div>

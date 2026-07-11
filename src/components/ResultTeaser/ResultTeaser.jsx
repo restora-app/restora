@@ -9,6 +9,8 @@ export default function ResultTeaser({
   contactMethod,
   contactValue,
   scoreResult,
+  referralCode,
+  alreadyWaitlisted,
 }) {
   const [linkCopied, setLinkCopied] = useState(false);
   const navigate = useNavigate();
@@ -28,7 +30,9 @@ export default function ResultTeaser({
   const { severity } = scoreResult;
 
   const handleCopyLink = async () => {
-    const shareUrl = window.location.origin;
+    const shareUrl = referralCode 
+      ? `${window.location.origin}?ref=${referralCode}`
+      : window.location.origin;
     const shareText = `I just took a 60-second cognitive fatigue assessment — turns out my brain's been running on fumes. Take it here: ${shareUrl}`;
     try {
       if (navigator.share) {
@@ -91,11 +95,11 @@ export default function ResultTeaser({
         <div className="flex flex-col justify-center items-center px-4 py-6 md:py-10 w-full text-center">
           <div className="inline-flex items-center gap-2 bg-green-100 shadow-sm mb-8 px-5 py-2 border border-green-300 rounded-full font-bold text-base text-green-800 animate-fade-in">
             <MdCheckCircle size={22} className="text-green-600" />
-            Waitlist spot confirmed
+            {alreadyWaitlisted ? "Already on the waitlist" : "Waitlist spot confirmed"}
           </div>
 
           <h2 className="mb-5 font-bold text-[#92360b] text-3xl md:text-4xl">
-            You're on the list!
+            {alreadyWaitlisted ? "You're already on the list!" : "You're on the list!"}
           </h2>
           <p className="max-w-sm font-medium text-[#4a3f35] text-lg leading-relaxed">
             We'll notify you as soon as Restora is ready for you. Hang tight!
